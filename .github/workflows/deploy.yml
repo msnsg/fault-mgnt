@@ -5,15 +5,15 @@ on:
     branches: [ "master" ]
 
 jobs:
-  fault-mgnt-tests:
+  build-and-test:
     runs-on: ubuntu-latest
     
-    # 1. Database for Testing in GitHub
+    # Testing-kaaga oru temporary database setup panrom
     services:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: fault-mgnt
+          POSTGRES_DB: fault-mgnt_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: admin1234
         ports:
@@ -24,41 +24,50 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Setup PHP 8.3 (Matches your EC2 server)
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.3
           extensions: pdo_pgsql, pgsql, mbstring, bcmath, xml, zip, intl
-          coverage: none
+          coverage: xdebug 
 
-      # 3. Cache Composer Dependencies
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.composer/cache
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
-
+      # 1. INSTALL
       - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-reqs
 
-      # 4. Run Migrations (Testing ground)
-      - name: Run Migrations (Test)
+      # 2. MIGRATE & 3. SEED (Inside Test Environment)
+      - name: Prepare Test Database
         run: |
           cp .env.example .env
           php artisan key:generate
           php artisan migrate --force
+          php artisan db:seed --force
         env:
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
           DB_PORT: 5432
-          DB_DATABASE: fault-mgnt
+          DB_DATABASE: fault-mgnt_test
           DB_USERNAME: postgres
           DB_PASSWORD: admin1234
 
-      # 5. Deployment to your EC2 Server
-      - name: Deploy to Production
+      # 4. TEST & 5. REPORT
+      - name: Run Tests and Report
+        run: php artisan test --display-failed-test-details
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: fault-mgnt_test
+          DB_USERNAME: postgres
+          DB_PASSWORD: admin1234
+
+  deploy:
+    #once the test is complete then itll run
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.IP }}
@@ -67,12 +76,8 @@ jobs:
           script: |
             cd /var/www/html
             git pull origin master
-            composer install --no-interaction --optimize-autoloader
+            composer install --no-interaction --optimize-autoloader --ignore-platform-reqs
             php artisan migrate --force
+            php artisan db:seed --force
             php artisan config:cache
             php artisan route:cache
-            # Build assets if Vite is used
-            if [ -f "package.json" ]; then
-                npm install
-                npm run build
-            fi
