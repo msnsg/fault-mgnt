@@ -8,14 +8,14 @@ jobs:
   fault-mgnt-tests:
     runs-on: ubuntu-latest
     
-    # 1. Faster Services
+    # 1. Database for Testing in GitHub
     services:
       postgres:
-        image: postgres:15
+        image: postgres:16
         env:
-          POSTGRES_DB: fault_api
+          POSTGRES_DB: fault-mgnt
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: admin1234
         ports:
           - 5432:5432
         options: --health-cmd="pg_isready -U postgres" --health-interval=10s
@@ -24,38 +24,40 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Setup PHP with Cache
+      # 2. Setup PHP 8.3 (Matches your EC2 server)
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
-          extensions: pdo_pgsql, pgsql
+          php-version: 8.3
+          extensions: pdo_pgsql, pgsql, mbstring, bcmath, xml, zip, intl
           coverage: none
 
-      # 3. Cache Composer (Fastest way)
+      # 3. Cache Composer Dependencies
       - name: Cache Composer dependencies
         uses: actions/cache@v4
         with:
-          path: /tmp/composer-cache
-          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      # 4. Safe Database Update (No Fresh Run)
-      - name: Run Migrations (Safe)
+      # 4. Run Migrations (Testing ground)
+      - name: Run Migrations (Test)
         run: |
           cp .env.example .env
+          php artisan key:generate
           php artisan migrate --force
         env:
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
           DB_PORT: 5432
-          DB_DATABASE: fault_api
+          DB_DATABASE: fault-mgnt
           DB_USERNAME: postgres
-          DB_PASSWORD: postgres
+          DB_PASSWORD: admin1234
 
-      # 5. Continuous Deployment (CD)
+      # 5. Deployment to your EC2 Server
       - name: Deploy to Production
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -63,9 +65,14 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /var/www/your-project-path
+            cd /var/www/html
             git pull origin master
             composer install --no-interaction --optimize-autoloader
             php artisan migrate --force
             php artisan config:cache
             php artisan route:cache
+            # Build assets if Vite is used
+            if [ -f "package.json" ]; then
+                npm install
+                npm run build
+            fi
