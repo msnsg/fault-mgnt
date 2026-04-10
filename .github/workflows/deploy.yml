@@ -52,7 +52,7 @@ jobs:
 
       # 4. TEST & 5. REPORT
       - name: Run Tests and Report
-        run: php artisan test --display-failed-test-details
+        run: php artisan test --stop-on-failure
         env:
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
