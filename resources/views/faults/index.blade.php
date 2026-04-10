@@ -48,9 +48,9 @@
                     </td>
 
                     <td>
-                        @if($fault->people->count() > 0)
+                        @if($fault->persons->count() > 0)
                             <ul class="mb-0">
-                                @foreach($fault->people as $person)
+                                @foreach($fault->persons as $person)
                                     <li>
                                         {{ $person->name }} ({{ $person->type }})
                                     </li>

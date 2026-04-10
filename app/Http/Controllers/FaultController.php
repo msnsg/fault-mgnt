@@ -13,21 +13,9 @@ class FaultController extends Controller
     */
     public function index()
     {
-        //$faults = Fault::with('people')->orderBy('id')->latest()->paginate(10);
-
-        $faults = Fault::with(['people', 'category'])
-            ->orderBy('id')
-            ->paginate(10);
-
-        //if (request()->wantsJson()) {
-            return response()->json(
-                $faults,
-                200
-            );
-        //}
-
+        $faults = Fault::with(['persons', 'category'])->orderBy('id')->paginate(1);
+        return response()->json($faults, 200, [], JSON_PRETTY_PRINT);
         //return view('faults.index', compact('faults'));
-
     }
 
     /*
@@ -49,14 +37,9 @@ class FaultController extends Controller
 
         if (!empty($data['people_involved'])) {
             foreach ($data['people_involved'] as $person) {
-                $fault->people()->create($person);
+                $fault->persons()->create($person);
             }
         }
-
-        // $fault = Fault::create(array_merge(
-        //     $data,
-        //     ['fault_reference' => Fault::generateReference()]
-        // ));
 
         if ($fault->save()) {
             return response()->json($fault, 201);

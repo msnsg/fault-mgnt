@@ -22,7 +22,7 @@ class Fault extends Model
         'incident_time' => 'datetime',
     ];
 
-    public function people()
+    public function persons()
     {
         return $this->hasMany(Person::class);
     }
