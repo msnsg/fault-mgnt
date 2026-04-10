@@ -8,6 +8,9 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreFaultRequest extends FormRequest
 {
+    /*
+    * validation rules
+    */
     public function rules()
     {
         return [
