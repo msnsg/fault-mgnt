@@ -14,13 +14,10 @@ class FaultController extends Controller
     public function index()
     {
         //$faults = Fault::with('people')->orderBy('id')->latest()->paginate(10);
-        // $faults = Fault::with(['people', 'category'])
-        //         ->orderBy('id', 'desc')
-        //         ->paginate(10);
 
         $faults = Fault::with(['people', 'category'])
             ->orderBy('id')
-            ->paginate(2);
+            ->paginate(10);
 
         //if (request()->wantsJson()) {
             return response()->json(
