@@ -62,7 +62,7 @@ jobs:
           DB_PASSWORD: admin1234
 
   deploy:
-    #once the test is complete then itll run
+    #once the test is completed then it will run
     needs: build-and-test
     runs-on: ubuntu-latest
     
