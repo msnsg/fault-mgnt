@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FaultController;
 
-Route::get('/faults', [FaultController::class, 'index']);
+#Route::get('/showfaults', [FaultController::class, 'show']);
 
 // Route::get('/', function () {
 //     return view('welcome');

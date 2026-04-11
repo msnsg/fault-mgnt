@@ -13,9 +13,9 @@ class FaultController extends Controller
     */
     public function index()
     {
-        $faults = Fault::with(['persons', 'category'])->orderBy('id')->paginate(1);
+        $faults = Fault::with(['persons', 'category'])->orderBy('id')->paginate(10);
         return response()->json($faults, 200, [], JSON_PRETTY_PRINT);
-        //return view('faults.index', compact('faults'));
+        #return view('faults.index', compact('faults'));
     }
 
     /*
@@ -42,7 +42,10 @@ class FaultController extends Controller
         }
 
         if ($fault->save()) {
-            return response()->json($fault, 201);
+            return response()->json([
+                'message' => 'Saved successfully',
+                'data' => $fault
+            ], 201);
         } else {
             return response()->json(['error' => 'Failed to save'], 500);
         }
