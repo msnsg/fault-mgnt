@@ -9,7 +9,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 class StoreFaultRequest extends FormRequest
 {
     /*
-    * validation rules
+    * validation rules & display json on endpoint (GET Method)
     */
     public function rules()
     {

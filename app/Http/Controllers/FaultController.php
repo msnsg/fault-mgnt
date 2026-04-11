@@ -9,7 +9,7 @@ use App\Http\Requests\StoreFaultRequest;
 class FaultController extends Controller
 {
     /*
-    * To Get all fault items list
+    * To Get all the fault items list
     */
     public function index()
     {
@@ -19,7 +19,7 @@ class FaultController extends Controller
     }
 
     /*
-    * To store fault items
+    * To store fault item with required data
     */
     public function store(StoreFaultRequest $request)
     {

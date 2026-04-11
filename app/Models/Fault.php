@@ -36,7 +36,7 @@ class Fault extends Model
     public static function generateReference()
     {
         /*
-        * Reference id auto increment
+        * Reference ID auto increment based on latest date
         */
         return \DB::transaction(function () {
             $date = now()->format('Ymd');

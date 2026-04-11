@@ -8,7 +8,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     
-    # Testing-kaaga oru temporary database setup panrom
+    # DATABASE SETUP 
     services:
       postgres:
         image: postgres:16
@@ -62,7 +62,7 @@ jobs:
           DB_PASSWORD: admin1234
 
   deploy:
-    #once the test is complete then itll run
+    #Once the test is complete then it will run
     needs: build-and-test
     runs-on: ubuntu-latest
     

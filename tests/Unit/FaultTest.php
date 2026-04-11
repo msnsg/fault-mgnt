@@ -10,7 +10,7 @@ use App\Models\Fault;
 class FaultTest extends TestCase
 {
     /**
-     * A basic test example.
+     * Basic test scenarios to check requested conditions.
      */
     use RefreshDatabase;
 
@@ -25,7 +25,7 @@ class FaultTest extends TestCase
     {
         $payload = [
             'location' => ['lat' => 1.1, 'long' => 103.1],
-            'incident_title' => 'Test Incident',
+            'incident_title' => 'System Failure',
             'category_id' => 1,
             'incident_time' => now()->toISOString(),
         ];
@@ -49,7 +49,7 @@ class FaultTest extends TestCase
     {
         $payload = [
             'location' => ['lat' => 1.1, 'long' => 103.1],
-            'incident_title' => 'Test',
+            'incident_title' => 'System Failure',
             'category_id' => 99,
             'incident_time' => now()->toISOString(),
         ];
@@ -62,12 +62,12 @@ class FaultTest extends TestCase
     {
         $payload = [
             'location' => ['lat' => 1.1, 'long' => 103.1],
-            'incident_title' => 'Test',
+            'incident_title' => 'System Failure',
             'category_id' => 1,
             'incident_time' => now()->toISOString(),
             'name' => 'John',        
             'type' => 'staff',       
-            'description' => 'Test', 
+            'description' => 'Due to some reason system failure', 
         ];
 
         $first = $this->postJson('/api/faults', $payload)->json();
