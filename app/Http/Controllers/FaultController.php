@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Fault;
-use App\Http\Requests\StoreFaultRequest;
+use Illuminate\Http\Request;
+//use App\Http\Requests\StoreFaultRequest;
+use Illuminate\Support\Facades\Validator;
 
 class FaultController extends Controller
 {
@@ -21,8 +23,35 @@ class FaultController extends Controller
     /*
     * To store fault item with required data
     */
-    public function store(StoreFaultRequest $request)
-    {
+    public function store(Request $request)
+    {  
+
+        if (!$request->isJson()) {
+            return response()->json([
+                'message' => 'Invalid content type. JSON required.'
+            ], 400);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'location.lat' => 'required|numeric|between:-90,90',
+            'location.long' => 'required|numeric|between:-180,180',
+            'incident_title' => 'required|string',
+            'category_id' => 'required|in:1,2,3',
+            'description' => 'nullable|string',
+            'incident_time' => 'required|date',
+            'people_involved' => 'array',
+            'people_involved.*.name' => 'required_with:people_involved|string',
+            'people_involved.*.type' => 'required_with:people_involved|in:staff,witness',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 422,
+                'message' => 'Validation failure — one or more input fields are invalid or missing',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        
         $data = $request->validated();
 
         $fault = Fault::create([
