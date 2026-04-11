@@ -42,10 +42,11 @@ class FaultController extends Controller
         }
 
         if ($fault->save()) {
-            return response()->json([
-                'message' => 'Saved successfully',
-                'data' => $fault
-            ], 201);
+             return response()->json($fault, 201);
+            // return response()->json([
+            //     'message' => 'Saved successfully',
+            //     'data' => $fault
+            // ], 201);
         } else {
             return response()->json(['error' => 'Failed to save'], 500);
         }
