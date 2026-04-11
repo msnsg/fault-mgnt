@@ -15,7 +15,7 @@ class FaultController extends Controller
     {
         $faults = Fault::with(['persons', 'category'])->orderBy('id')->paginate(10);
         return response()->json($faults, 200, [], JSON_PRETTY_PRINT);
-        #return view('faults.index', compact('faults'));
+        #return view('faults.index', compact('faults')); //for view 
     }
 
     /*
