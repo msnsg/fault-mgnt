@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Fault extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'fault_reference',
         'incident_title',
@@ -39,7 +39,7 @@ class Fault extends Model
     public static function generateReference()
     {
         /*
-        * Reference ID auto increment based on latest date
+        * Reference ID auto increment based on current date
         */
         return \DB::transaction(function () {
             $date = now()->format('Ymd');
