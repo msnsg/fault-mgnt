@@ -30,7 +30,7 @@ class StoreFaultRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'status' => false,
-            'message' => 'Validation failed',
+            'message' => 'Validation failure — one or more input fields are invalid or missing',
             'errors' => $validator->errors(),
         ], 422));
     }

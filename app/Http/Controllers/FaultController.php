@@ -41,11 +41,27 @@ class FaultController extends Controller
             }
         }
 
-        if ($fault->save()) {
-             return response()->json($fault, 201);
-        } else {
-            return response()->json(['error' => 'Failed to save'], 500);
+        try {
+            $fault->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Saved successfully',
+                'data' => $fault
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Internal server error'
+            ], 500);
         }
+
+        // if ($fault->save()) {
+        //      return response()->json($fault, 201);
+        // } else {
+        //     return response()->json(['error' => 'Failed to save'], 500);
+        // }
     }
 }
 
