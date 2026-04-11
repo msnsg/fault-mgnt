@@ -40,22 +40,7 @@ class FaultController extends Controller
                 $fault->persons()->create($person);
             }
         }
-
-        try {
-    $fault->save();
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Fault created successfully',
-        'data' => $fault
-    ], 201);
-
-} catch (\Exception $e) {
-    return response()->json([
-        'status' => false,
-        'message' => 'Internal server error'
-    ], 500);
-}
+   
 
         if ($fault->save()) {
             return response()->json([
